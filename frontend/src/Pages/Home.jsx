@@ -3,6 +3,11 @@ import HeroSection from "../components/HeroSection";
 import Footer from "../layout/Footer";
 import Header from "../layout/Header";
 import TestimonialSlider from "../components/Testimonial";
+import FAQComponent from "../components/FAQ";
+import FeaturesSection from "../components/Features";
+import AboutSection from "../components/About";
+import FinanceSection from "../components/FinanceSection";
+import AboutUs from "../components/About";
 
 const Home = () => {
   return (
@@ -11,11 +16,21 @@ const Home = () => {
         <Header />
         <HeroSection />
       </div>
-
+      <div className="w-full bg-gray-300 ">
+        <FeaturesSection />
+      </div>
+      <div className="w-full bg-gray-900 ">
+        <AboutUs />
+      </div>
       <div className="w-full bg-gray-300 ">
         <TestimonialSlider />
       </div>
-
+      <div className="w-full bg-gray-900 ">
+        <FAQComponent />
+      </div>
+      <div className="w-full bg-gray-300 ">
+        <FinanceSection />
+      </div>
       <Footer />
     </>
   );

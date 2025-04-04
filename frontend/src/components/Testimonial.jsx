@@ -44,16 +44,15 @@ const testimonials = [
 
 export default function TestimonialSlider() {
   return (
-    <div className="container mx-auto py-16 px-6 text-gray-100">
+    <div className="container mx-auto py-16 px-4 sm:px-6 md:px-10 lg:px-20 text-gray-50">
       {/* Section Heading */}
       <div className="text-center max-w-3xl mx-auto mb-12">
         <h2 className="text-4xl sm:text-5xl font-extrabold leading-tight mb-4 text-gray-900 drop-shadow-md">
-          Smart Expense Tracking,
-          <br className="hidden sm:block" /> Smarter Savings
+          Real Stories, Real Impact
         </h2>
-        <p className="text-lg text-gray-400">
-          Discover how our users are gaining control over their finances with
-          ease.
+        <p className="text-lg text-gray-700">
+          Hear how our users are simplifying budgeting and achieving financial
+          freedom with confidence.
         </p>
       </div>
 
