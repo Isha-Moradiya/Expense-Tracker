@@ -10,7 +10,6 @@ import Login from "./Pages/Login";
 import Logout from "./Pages/Logout";
 
 // Private Pages
-import EditProfile from "./Pages/EditProfile";
 import Expense from "./Pages/Expense";
 import Income from "./Pages/Income";
 import Investment from "./Pages/Investment";
@@ -41,7 +40,6 @@ const App = () => {
         {/* Private Routes (Wrapped in ProtectedRoute) */}
         <Route element={<ProtectedRoute />}>
           <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/edit-profile/:id" element={<EditProfile />} />
           <Route path="/expense" element={<Expense />} />
           <Route path="/income" element={<Income />} />
           <Route path="/investment" element={<Investment />} />

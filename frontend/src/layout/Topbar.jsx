@@ -4,6 +4,8 @@ import { FaUserEdit, FaSignOutAlt } from "react-icons/fa";
 import { useAuth } from "../Store/auth";
 import { NavLink } from "react-router-dom";
 import Logo from "../components/Logo";
+import axios from "axios";
+import { toast } from "react-toastify";
 
 const Topbar = () => {
   const [isProfileDropdownOpen, setProfileDropdownOpen] = useState(false);
@@ -14,7 +16,7 @@ const Topbar = () => {
     photo: "",
   });
   const [photoPreview, setPhotoPreview] = useState(null);
-  const { isLoggedIn, LogoutUser, user } = useAuth();
+  const { isLoggedIn, LogoutUser, user, authorizationToken } = useAuth();
 
   const handleEditProfile = () => {
     setUpdatedUser({

@@ -12,7 +12,6 @@ import investmentRoute from "./Router/investment-router.js";
 import lentRoute from "./Router/lent-router.js";
 import borrowRoute from "./Router/borrow-router.js";
 import categoryRoute from "./Router/category-router.js";
-import loanRoute from "./Router/loan-router.js";
 
 dotenv.config();
 
@@ -39,7 +38,6 @@ app.use("/api/investment", investmentRoute);
 app.use("/api/lent", lentRoute);
 app.use("/api/borrow", borrowRoute);
 app.use("/api/category", categoryRoute);
-app.use("/api/loan", loanRoute);
 
 app.use(errorMiddleware);
 
