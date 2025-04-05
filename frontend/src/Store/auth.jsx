@@ -23,10 +23,13 @@ export const AuthProvider = ({ children }) => {
   const userAuthentication = async () => {
     if (!token) return;
     try {
-      const response = await fetch("http://localhost:5006/api/auth/user", {
-        method: "GET",
-        headers: { Authorization: authorizationToken },
-      });
+      const response = await fetch(
+        `${import.meta.env.VITE_BACKEND_URL}/api/auth/user`,
+        {
+          method: "GET",
+          headers: { Authorization: authorizationToken },
+        }
+      );
       // console.log(response);
 
       if (response.ok) {

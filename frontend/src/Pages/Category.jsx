@@ -4,7 +4,7 @@ import { motion } from "framer-motion";
 import { useAuth } from "../Store/auth";
 import { toast } from "react-toastify";
 import { FaPlus } from "react-icons/fa";
-import { ChevronDownIcon, X } from "lucide-react";
+import { ChevronDownIcon, Trash, X } from "lucide-react";
 import { Link } from "react-router-dom";
 const colors = {
   Expense: "text-red-600 border-red-300",
