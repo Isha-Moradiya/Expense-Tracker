@@ -18,7 +18,7 @@ dotenv.config();
 const app = express();
 
 const corsOptions = {
-  origin: "https://expensia.vercel.app",
+  origin: "https://expensia-app.vercel.app",
   methods: "GET,POST,PATCH,PUT,DELETE,HEAD",
   credentials: true,
 };
