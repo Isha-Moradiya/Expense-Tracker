@@ -30,6 +30,11 @@ const VerifyEmail = () => {
         setStatus("success");
         setMessage(data.message);
         toast.success(data.message);
+
+        // Navigate to login page after short delay
+        setTimeout(() => {
+          navigate("/login");
+        }, 3000);
       } catch (error) {
         setStatus("error");
         setMessage(
@@ -39,7 +44,7 @@ const VerifyEmail = () => {
           error.response?.data?.message || "Email verification failed."
         );
 
-        // ✅ Extract email from response if available
+        // Extract email from response if available
         if (error.response?.data?.email) {
           setEmail(error.response.data.email);
         }
@@ -51,15 +56,24 @@ const VerifyEmail = () => {
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-100">
-      <div className="bg-white p-6 rounded-lg shadow-lg text-center max-w-sm">
+      <div className="bg-white p-6 rounded-lg shadow-lg text-center max-w-sm w-full">
         {status === "loading" && (
           <>
-            <div className="animate-spin h-10 w-10 border-4 border-blue-500 border-t-transparent rounded-full mx-auto"></div>
+            <div className="relative w-14 h-14 mx-auto">
+              <div className="absolute inset-0 bg-blue-400 rounded-full animate-ping opacity-75"></div>
+              <div className="relative bg-blue-500 w-full h-full rounded-full flex items-center justify-center text-white text-xl font-bold">
+                🔄
+              </div>
+            </div>
             <h2 className="text-xl font-semibold mt-4 text-gray-700">
-              Verifying Email...
+              Verifying your email...
             </h2>
+            <p className="text-sm text-gray-500 mt-2 animate-pulse">
+              Please wait while we verify your email...
+            </p>
           </>
         )}
+
         {status === "success" && (
           <>
             <div className="text-green-500 text-4xl">✅</div>
@@ -70,6 +84,7 @@ const VerifyEmail = () => {
             <p className="text-blue-500 mt-4">Redirecting to login...</p>
           </>
         )}
+
         {status === "error" && (
           <>
             <div className="text-red-500 text-4xl">❌</div>

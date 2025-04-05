@@ -12,7 +12,7 @@ const register = async (req, res, next) => {
     if (userExists) {
       return res.status(400).json({
         message: "Email Already Exists",
-        needsVerification: !userExists.isVerified, // Check if email verification is still pending
+        needsVerification: !userExists.isVerified,
       });
     }
 
@@ -30,9 +30,8 @@ const register = async (req, res, next) => {
       password,
       isVerified: false,
       verificationToken: hashedToken,
-      verificationExpires: Date.now() + 5 * 60 * 1000, // Token expiry: 5 minutes
+      verificationExpires: Date.now() + 5 * 60 * 1000,
     });
-
 
     // Send verification email with HTML content using the template
     const htmlContent = verificationEmailTemplate(verificationToken);
@@ -80,7 +79,10 @@ const verifyEmail = async (req, res, next) => {
     user.verificationExpires = null;
     await user.save();
 
-    res.json({ message: "Email verified successfully! You can now log in." });
+    res.json({
+      message: "Email verified successfully! You can now log in.",
+      token: await user.generateToken(),
+    });
   } catch (error) {
     next(error);
   }
@@ -115,13 +117,15 @@ const resendEmail = async (req, res, next) => {
     user.verificationExpires = Date.now() + 5 * 60 * 1000;
     await user.save();
 
-    await sendMail(user.email, verificationToken);
+    const htmlContent = verificationEmailTemplate(verificationToken);
+    await sendMail(user.email, "Verify Your Email", htmlContent);
 
     res.json({ message: "Verification email resent successfully" });
   } catch (error) {
     next(error);
   }
 };
+
 const login = async (req, res, next) => {
   try {
     const { email, password } = req.body;

@@ -7,7 +7,20 @@ export const verificationEmailTemplate = (token) => {
         <p style="font-size: 16px; color: #555555;">
           We noticed a login attempt to your account. Please verify your identity by clicking the button below. This link will expire in <strong>5 minutes</strong>:
         </p>
-        <a href="${verificationLink}" style="display: inline-block; margin-top: 20px; padding: 12px 24px; font-size: 16px; color: #ffffff; background-color: #007bff; border-radius: 6px; text-decoration: none;">Verify Login</a>
+<a href="${verificationLink}" style="
+  display: inline-block;
+  margin-top: 20px;
+  padding: 12px 24px;
+  font-size: 16px;
+  font-weight: 600;
+  color: #fff;
+  background-color: #1d4ed8;
+  border-radius: 8px;
+  text-decoration: none;
+  transition: background 0.3s ease;
+">
+  Verify Email
+</a>
         <p style="margin-top: 20px; font-size: 14px; color: #777777;">If you did not attempt this login, please ignore this email or reset your password immediately.</p>
       </div>
     </div>
