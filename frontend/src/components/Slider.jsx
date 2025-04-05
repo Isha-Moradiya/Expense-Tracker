@@ -19,21 +19,33 @@ const Slider = () => {
     async function fetchData() {
       try {
         const responses = await Promise.allSettled([
-          axios.get("http://localhost:5006/api/expense/get-expense", {
+          axios.get(
+            `${import.meta.env.VITE_BACKEND_URL}/api/expense/get-expense`,
+            {
+              headers: { Authorization: authorizationToken },
+            }
+          ),
+          axios.get(
+            `${import.meta.env.VITE_BACKEND_URL}/api/income/get-income`,
+            {
+              headers: { Authorization: authorizationToken },
+            }
+          ),
+          axios.get(
+            `${import.meta.env.VITE_BACKEND_URL}/api/investment/get-investment`,
+            {
+              headers: { Authorization: authorizationToken },
+            }
+          ),
+          axios.get(`${import.meta.env.VITE_BACKEND_URL}/api/lent/get-lent`, {
             headers: { Authorization: authorizationToken },
           }),
-          axios.get("http://localhost:5006/api/income/get-income", {
-            headers: { Authorization: authorizationToken },
-          }),
-          axios.get("http://localhost:5006/api/investment/get-investment", {
-            headers: { Authorization: authorizationToken },
-          }),
-          axios.get("http://localhost:5006/api/lent/get-lent", {
-            headers: { Authorization: authorizationToken },
-          }),
-          axios.get("http://localhost:5006/api/borrow/get-borrow", {
-            headers: { Authorization: authorizationToken },
-          }),
+          axios.get(
+            `${import.meta.env.VITE_BACKEND_URL}/api/borrow/get-borrow`,
+            {
+              headers: { Authorization: authorizationToken },
+            }
+          ),
         ]);
 
         const getData = (index, key) =>
