@@ -6,6 +6,7 @@ import {
 import { FaGithubSquare, FaLinkedin } from "react-icons/fa";
 import { NavLink } from "react-router-dom";
 import Logo from "../components/Logo";
+import { ArrowUp } from "lucide-react";
 
 const Footer = () => {
   const currentYear = new Date().getFullYear();
@@ -67,14 +68,14 @@ const Footer = () => {
         </div>
 
         {/* Bottom Section */}
-        <div className="border-t border-gray-800 pt-8 flex flex-col md:flex-row justify-between items-center text-sm">
-          {/* Copyright */}
-          <p className="text-gray-400">
+        <div className="border-t border-gray-800 pt-8 flex flex-col gap-4 sm:gap-6 md:flex-row md:justify-between md:items-center text-sm">
+          {/* Left: Copyright */}
+          <p className="text-gray-400 text-center md:text-left">
             © {new Date().getFullYear()} eluxspace. All rights reserved.
           </p>
 
-          {/* Social Icons */}
-          <div className="flex space-x-4 text-gray-400">
+          {/* Center: Social Icons */}
+          <div className="flex justify-center space-x-4 text-gray-400">
             {[
               { icon: <FaSquareTwitter size={20} />, label: "Twitter" },
               { icon: <FaLinkedin size={20} />, label: "LinkedIn" },
@@ -93,8 +94,18 @@ const Footer = () => {
             ))}
           </div>
 
-          {/* Tagline */}
-          <p className="text-gray-300">Smarter Money. Better Future.</p>
+          {/* Right: Tagline + Scroll to Top */}
+          <div className="flex justify-center md:justify-end items-center gap-4">
+            <p className="text-gray-300 text-center md:text-right">
+              Smarter Money. Better Future.
+            </p>
+            <button
+              onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+              className="w-10 h-10 text-white bg-gray-500 hover:bg-gray-600 rounded-full flex items-center justify-center shadow-md transition-all duration-300"
+            >
+              <ArrowUp size={20} />
+            </button>
+          </div>
         </div>
       </div>
     </footer>

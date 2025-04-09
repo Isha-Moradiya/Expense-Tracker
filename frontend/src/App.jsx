@@ -18,19 +18,18 @@ import BorrowMoney from "./Pages/BorrowMoney";
 import Category from "./Pages/Category";
 import Dashboard from "./Pages/Dashboard";
 import Home from "./Pages/Home";
+import FeaturesSection from "./components/Features";
+import ScrollToTop from "./layout/ScrollToTop";
 
 const App = () => {
   const { isLoggedIn } = useAuth();
 
   return (
     <BrowserRouter>
+      <ScrollToTop />
       <Routes>
         {/* Public Routes */}
         <Route path="/" element={<Home />} />
-        <Route path="/testimonial" element={<Home />} />
-        <Route path="/about" element={<Home />} />
-        <Route path="/feature" element={<Home />} />
-        <Route path="/faq" element={<Home />} />
         <Route path="/register" element={<Register />} />
         <Route path="/login" element={<Login />} />
         <Route path="/verify-email" element={<VerifyEmail />} />

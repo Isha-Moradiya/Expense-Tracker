@@ -18,5 +18,8 @@ router
 router
   .route("/delete-investment/:id")
   .delete(authMiddleware, investmentControllers.deleteInvestment);
+router
+  .route("/investment-chart")
+  .get(authMiddleware, investmentControllers.getInvestmentChart);
 
 export default router;

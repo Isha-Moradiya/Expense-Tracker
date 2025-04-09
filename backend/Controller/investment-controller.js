@@ -41,7 +41,7 @@ const createInvestment = async (req, res, next) => {
     const newInvestment = new Investment({
       userId,
       name,
-      investmentType: investmentTypeId,
+      investmentType: investmentType,
       platform,
       currentAmount,
       investedAmount,
@@ -93,7 +93,7 @@ const getInvestment = async (req, res, next) => {
     );
 
     const withdrawInvestments =
-      summary.totalInvestments - summary.currentAmountTotal;
+      summary.currentAmountTotal - summary.totalInvestments;
 
     res.status(200).json({
       message: "Investments retrieved successfully.",
@@ -162,9 +162,50 @@ const deleteInvestment = async (req, res, next) => {
   }
 };
 
+const getInvestmentChart = async (req, res, next) => {
+  try {
+    const userId = req.userID;
+    const { month, year } = req.query;
+
+    if (!userId)
+      return res.status(401).json({ message: "Unauthorized access." });
+    if (!month || !year)
+      return res.status(400).json({ message: "Month and year required." });
+
+    const startDate = new Date(year, month - 1, 1);
+    const endDate = new Date(year, month, 0, 23, 59, 59);
+
+    const investments = await Investment.find({
+      userId,
+      createdAt: { $gte: startDate, $lte: endDate },
+    });
+
+    const chartData = {};
+
+    investments.forEach((inv) => {
+      const day = inv.createdAt.toISOString().split("T")[0]; // YYYY-MM-DD
+      if (!chartData[day]) {
+        chartData[day] = { Invested: 0, Withdrawn: 0, day };
+      }
+
+      chartData[day].Invested += inv.investedAmount;
+      chartData[day].Withdrawn += inv.currentAmount - inv.investedAmount; // Assuming difference is withdrawn
+    });
+
+    const result = Object.values(chartData).sort((a, b) =>
+      a.day.localeCompare(b.day)
+    );
+
+    res.status(200).json(result);
+  } catch (error) {
+    next(error);
+  }
+};
+
 export default {
   createInvestment,
   getInvestment,
   updateInvestment,
   deleteInvestment,
+  getInvestmentChart,
 };

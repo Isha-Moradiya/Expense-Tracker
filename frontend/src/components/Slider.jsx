@@ -94,30 +94,37 @@ const Slider = () => {
   }, [authorizationToken]);
 
   return (
-    <div className="p-6 overflow-hidden">
-      <Swiper spaceBetween={24} slidesPerView={4} className="mySwiper">
+    <div className="py-6 px-4 sm:px-6">
+      <Swiper
+        spaceBetween={16}
+        breakpoints={{
+          320: { slidesPerView: 1 },
+          480: { slidesPerView: 1.2 },
+          640: { slidesPerView: 2 },
+          768: { slidesPerView: 2.5 },
+          1024: { slidesPerView: 3 },
+          1280: { slidesPerView: 4 },
+        }}
+        className="mySwiper"
+      >
         {cardData.map((item, index) => (
           <SwiperSlide key={index}>
-            <div className="bg-gradient-to-br from-white to-gray-100 p-6 rounded-xl shadow-lg hover:shadow-xl hover:-translate-y-2 transition-all transform hover:scale-105">
-              <div className="flex flex-col items-center text-center">
-                <div
-                  className={`p-5 rounded-full text-4xl mb-4 shadow-md ${
-                    index % 2 === 0
-                      ? "bg-gradient-to-r from-blue-500 to-blue-600 text-white"
-                      : "bg-gradient-to-r from-teal-500 to-teal-700 text-white"
-                  }`}
-                >
-                  {item.icon}
-                </div>
-
-                <h3 className="text-gray-600 text-xs uppercase tracking-widest">
-                  {item.title}
-                </h3>
-
-                <h2 className="text-4xl font-bold text-gray-900 mt-2">
-                  ₹ {item.amount.toLocaleString()}
-                </h2>
+            <div className="bg-gradient-to-tr from-purple-100 to-indigo-100 rounded-2xl border border-gray-300 shadow-md hover:shadow-xl transition duration-300 transform hover:-translate-y-1 hover:scale-[1.02] p-6 mx-auto min-h-[200px] flex flex-col items-center text-center">
+              <div
+                className={`w-16 h-16 flex items-center justify-center rounded-full text-2xl mb-4 shadow ${
+                  index % 2 === 0
+                    ? "bg-gradient-to-r from-blue-500 to-blue-600 text-white"
+                    : "bg-gradient-to-r from-teal-500 to-teal-700 text-white"
+                }`}
+              >
+                {item.icon}
               </div>
+              <p className="text-sm text-gray-500 font-medium uppercase tracking-wide mt-2">
+                {item.title}
+              </p>
+              <h2 className="text-3xl font-extrabold text-gray-800 mt-2 tracking-tight">
+                ₹ {item.amount.toLocaleString()}
+              </h2>
             </div>
           </SwiperSlide>
         ))}

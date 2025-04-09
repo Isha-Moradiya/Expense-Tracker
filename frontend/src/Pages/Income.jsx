@@ -6,6 +6,9 @@ import { motion } from "framer-motion";
 import { useAuth } from "../Store/auth";
 import { Link, useLocation } from "react-router-dom";
 import { ChevronDown, Edit2, Trash, TrendingUp, X } from "lucide-react";
+import Breadcrumb from "../layout/Breadcrumbs";
+import SearchBar from "../layout/SearchBar";
+import TopActionBar from "../layout/PageHeader";
 
 const Income = () => {
   const { authorizationToken } = useAuth();
@@ -25,6 +28,24 @@ const Income = () => {
   const [showModal, setShowModal] = useState(false);
   const [expanded, setExpanded] = useState(null);
   const [deleteModal, setDeleteModal] = useState(null);
+  const [filterDate, setFilterDate] = useState("");
+  const [searchTerm, setSearchTerm] = useState("");
+
+  const getFilteredIncomes = () => {
+    return incomes.filter((income) => {
+      if (filterDate && !income.date.startsWith(filterDate)) return false;
+
+      const search = searchTerm.toLowerCase();
+      const matchesSearch =
+        income.source?.name?.toLowerCase().includes(search) ||
+        income.description?.toLowerCase().includes(search);
+
+      if (searchTerm && !matchesSearch) return false;
+      return true;
+    });
+  };
+
+  const filteredIncomes = getFilteredIncomes();
 
   // Fetch incomes
   const fetchIncomes = async () => {
@@ -160,56 +181,32 @@ const Income = () => {
 
   return (
     <>
-      <motion.div className="flex-1 mx-auto my-12 p-6">
-        <div className="p-8">
+      <motion.div className="flex-1 mx-auto my-12 max-w-full">
+        <div className="px-6">
           {/* Header Section */}
-          <div className="flex justify-between items-center mb-6">
-            <h2 className="text-4xl font-bold text-gray-800 tracking-tight">
-              Incomes
-            </h2>
-            <button
-              onClick={() => handleOpenModal(null)}
-              className="bg-gradient-to-r from-green-500 to-green-700 text-white p-4 rounded-full shadow-lg hover:scale-110 hover:shadow-xl transition-transform flex items-center justify-center"
-              aria-label="Add Income"
-            >
-              <FaPlus size={20} />
-            </button>
+          <div className="flex justify-end items-center mb-6">
+            <TopActionBar
+              label="Income"
+              onAddClick={() => handleOpenModal(null)}
+              filterDate={filterDate}
+              onDateChange={setFilterDate}
+            />
           </div>
 
           {/* Breadcrums for navigate */}
-          <nav className="text-sm text-gray-500 mb-4 flex items-center space-x-2">
-            <Link
-              to="/home"
-              className={`${
-                location.pathname === "/home"
-                  ? "text-cyan-900 font-semibold"
-                  : "hover:text-cyan-900"
-              }`}
-            >
-              Home
-            </Link>
-            <span className="text-gray-400">/</span>
-            <Link
-              to="/income"
-              className={`${
-                location.pathname === "/income"
-                  ? "text-cyan-900 font-semibold"
-                  : "hover:text-cyan-900"
-              }`}
-            >
-              Income
-            </Link>
-          </nav>
+          <Breadcrumb />
 
           {/* Total Income Section */}
-          <div className="mb-6">
-            <div className="bg-green-100 p-6 rounded-2xl flex items-center shadow-md">
-              <div className="bg-green-200 p-3 rounded-full">
-                <TrendingUp className="text-green-600 text-2xl" />
+          <div className="mb-7">
+            <div className="bg-gradient-to-r from-green-100 via-green-200 to-green-300 p-6 rounded-2xl flex flex-col items-center justify-between shadow-md md:flex-row md:justify-start sm:px-8 sm:py-6 space-y-4 sm:space-y-0 sm:space-x-6 transition-transform duration-300 transform hover:shadow-lg">
+              <div className="bg-white p-4 rounded-full text-6xl text-green-600 shadow-lg flex-shrink-0">
+                📈
               </div>
-              <div className="ml-4">
-                <h3 className="text-sm text-gray-500">Total Income</h3>
-                <p className="text-4xl font-extrabold text-gray-800">
+              <div className="w-full sm:w-auto text-center sm:text-left md:pt-2 lg:pt-1.5">
+                <h3 className="text-sm font-medium text-gray-700 truncate">
+                  Total Income
+                </h3>
+                <p className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-gray-800 truncate">
                   ₹{totalIncome.toLocaleString()}
                 </p>
               </div>
@@ -217,135 +214,134 @@ const Income = () => {
           </div>
 
           {/* Search Filter Section */}
-          <div className="mb-6 flex items-center justify-between">
-            <div className="flex items-center border border-gray-300 rounded-full px-4 py-3 shadow-sm w-full focus-within:border-green-400">
-              <FaSearch className="text-gray-300 text-lg mr-2 focus-within:text-green-400" />
-              <input
-                type="text"
-                placeholder="Search expense..."
-                className="w-full bg-transparent outline-none text-sm text-gray-500"
-                onFocus={(e) =>
-                  e.target.previousSibling.classList.add("text-green-400")
-                }
-                onBlur={(e) =>
-                  e.target.previousSibling.classList.remove("text-green-400")
-                }
-              />
-            </div>
-
-            {/* <div className="ml-4 p-3 rounded-full bg-cyan-100 shadow-lg hover:bg-cyan-200 transition-colors">
-              <FaCalendarAlt className="text-cyan-600 text-xl" />
-            </div> */}
-          </div>
+          <SearchBar
+            placeholder={"Search Income..."}
+            searchValue={searchTerm}
+            onSearchChange={setSearchTerm}
+          />
 
           {/* Income List Section */}
           <motion.div className="mt-6">
-            <h3 className="text-2xl font-semibold mb-4 text-gray-800">
-              Income List
-            </h3>
-
-            {incomes.length === 0 ? (
+            {filteredIncomes.length === 0 ? (
               <p className="text-center text-gray-600 text-lg italic">
                 No incomes added yet.
               </p>
             ) : (
-              <div className="space-y-6 bg-gradient-to-b from-green-50 to-gray-50 p-6 rounded-lg">
-                {incomes.map((inc) => (
-                  <div
+              <div className="space-y-6">
+                {filteredIncomes.map((inc) => (
+                  <motion.div
                     key={inc._id}
-                    className="bg-white p-5 rounded-xl shadow-md border border-gray-200 hover:shadow-lg transition-all w-full"
+                    layout
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -10 }}
+                    transition={{ duration: 0.25, ease: "easeOut" }}
+                    className="bg-white p-4 sm:p-5 rounded-2xl border border-gray-200 shadow-md hover:shadow-lg transition-all relative"
                   >
-                    {/* Top Section: Main Income Details */}
-                    <div className="flex items-center justify-between">
-                      {/* Left Side - Income Icon & Details */}
-                      <div className="flex items-start space-x-5">
-                        {/* Source Icon */}
-                        <div className="w-14 h-14 rounded-full overflow-hidden border border-red-400 shadow">
+                    {/* Chevron Button */}
+                    <motion.button
+                      className="absolute top-0 right-1 p-2 rounded-full hover:bg-gray-200 text-gray-600 transition"
+                      initial={{ rotate: 0 }}
+                      animate={{ rotate: expanded === inc._id ? 180 : 0 }}
+                      onClick={() =>
+                        setExpanded(inc._id === expanded ? null : inc._id)
+                      }
+                    >
+                      <ChevronDown size={22} />
+                    </motion.button>
+
+                    {/* Main Row */}
+                    <div className="flex flex-wrap justify-between items-start sm:items-center gap-4">
+                      {/* Left Block */}
+                      <div className="flex items-start gap-4 flex-1 min-w-[220px]">
+                        {/* Icon/Image */}
+                        <div className="w-10 h-10 flex-shrink-0">
                           {inc?.source?.iconImage ? (
                             <img
                               src={`${
                                 import.meta.env.VITE_BACKEND_URL
                               }/uploads/${inc.source.iconImage}`}
-                              alt={inc.source.name || "Category"}
-                              className="w-full h-full object-cover"
+                              alt={inc.source.name || "Source"}
+                              className="w-full h-full object-contain rounded transition-transform duration-200 hover:scale-105"
                             />
                           ) : (
-                            <div className="w-full h-full flex items-center justify-center bg-gray-200 text-gray-600">
+                            <div className="text-xs text-gray-400">
                               No Image
                             </div>
                           )}
                         </div>
 
-                        {/* Income Details */}
+                        {/* Name & Description */}
                         <div className="flex flex-col">
-                          <h2 className="text-lg font-semibold text-gray-900">
-                            {inc?.source?.name}
-                          </h2>
-                          <p className="text-sm text-gray-600">
-                            {inc.description}
+                          <p className="text-sm font-medium text-gray-800 line-clamp-1">
+                            {inc?.source?.name || "No Source"}
                           </p>
-                          <p className="text-xs text-gray-500 mt-1">
-                            {new Date(inc.date).toLocaleDateString()}
-                          </p>
+                          <span className="text-xs text-gray-500 mt-1">
+                            {inc.description || "No description"}
+                          </span>
                         </div>
                       </div>
 
-                      {/* Right Side - Amount & Dropdown Button */}
-                      <div className="flex items-center">
-                        {/* Income Amount */}
-                        <p className="text-xl font-bold text-green-800 mr-8">
+                      {/* Amount */}
+                      <div className="flex flex-col items-end text-right px-6 py-2">
+                        <span className="text-sm font-medium text-gray-500">
+                          Amount:
+                        </span>
+                        <span className="text-lg sm:text-xl font-bold text-gray-800 mt-1">
                           ₹{inc.amount.toLocaleString()}
-                        </p>
-
-                        <motion.button
-                          className="p-2 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-600 transition"
-                          initial={{ rotate: 0 }}
-                          animate={{ rotate: expanded === inc._id ? 180 : 0 }}
-                        >
-                          <ChevronDown
-                            size={18}
-                            onClick={() =>
-                              setExpanded(inc._id === expanded ? null : inc._id)
-                            }
-                          />
-                        </motion.button>
+                        </span>
                       </div>
                     </div>
 
-                    {/* Expanded Dropdown Section */}
+                    {/* Expanded Section */}
                     <motion.div
                       initial={{ opacity: 0, height: 0 }}
                       animate={
                         expanded === inc._id
-                          ? { opacity: 1, height: "auto" }
-                          : { opacity: 0, height: 0 }
+                          ? { opacity: 1, height: "auto", marginTop: 16 }
+                          : { opacity: 0, height: 0, marginTop: 0 }
                       }
                       transition={{ duration: 0.3 }}
                       className="overflow-hidden"
                     >
-                      <div className="flex items-center justify-between mt-4 border-t pt-4 bg-gray-50 p-4 rounded-md">
-                        <p className="text-gray-700">
-                          DESCRIPTION : {inc.description}
-                        </p>
+                      <div className="mt-4 bg-gradient-to-br from-green-50 to-white border-t pt-5 px-4 pb-4 rounded-xl shadow-inner text-sm text-gray-700 space-y-3">
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <span className="text-gray-500">📅</span>
+                          <span>
+                            <span className="font-medium text-gray-600">
+                              Date:
+                            </span>{" "}
+                            {new Date(inc.date).toLocaleDateString()}
+                          </span>
+                        </div>
 
-                        {/* Buttons: Edit & Delete */}
-                        <div className="flex justify-end space-x-3 mt-3">
+                        {/* Buttons */}
+                        <div className="pt-4 flex flex-wrap justify-end gap-3">
                           <button
                             onClick={() => handleOpenModal(inc)}
-                            className="px-4 py-2 text-blue-600 border border-blue-600 rounded-lg hover:bg-blue-50 transition"
+                            className="group flex items-center gap-2 px-4 py-2 text-sm font-medium text-blue-700 bg-blue-50 border border-blue-200 rounded-xl hover:bg-blue-100 hover:text-blue-800 transition-all shadow-sm"
                           >
-                            <Edit2 />
+                            <Edit2
+                              size={16}
+                              className="group-hover:scale-110 transition-transform"
+                            />
+                            Edit
                           </button>
+
                           <button
                             onClick={() => handleDeleteClick(inc._id)}
-                            className="px-4 py-2 text-red-600 border border-red-600 rounded-lg hover:bg-red-50 transition"
+                            className="group flex items-center gap-2 px-4 py-2 text-sm font-medium text-red-700 bg-red-50 border border-red-200 rounded-xl hover:bg-red-100 hover:text-red-800 transition-all shadow-sm"
                           >
-                            <Trash />
+                            <Trash
+                              size={16}
+                              className="group-hover:scale-110 transition-transform"
+                            />
+                            Delete
                           </button>
                         </div>
                       </div>
                     </motion.div>
-                  </div>
+                  </motion.div>
                 ))}
               </div>
             )}

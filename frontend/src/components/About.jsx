@@ -6,7 +6,7 @@ export default function AboutUs() {
         <div className="relative group w-full max-w-3xl mx-auto">
           <div className="rounded-3xl overflow-hidden shadow-xl transform transition-transform duration-500 group-hover:scale-105">
             <img
-              src="/images/About2.jpg"
+              src="/images/About3.jpg"
               alt="Team working on expense tracker"
               className="w-full h-auto object-cover rounded-3xl"
             />

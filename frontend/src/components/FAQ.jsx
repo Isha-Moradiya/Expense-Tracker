@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { ChevronDown, ChevronUp, Minus, Plus } from "lucide-react";
+import { useRef, useState } from "react";
+import { Plus } from "lucide-react";
 
 const faqs = [
   {
@@ -47,13 +47,25 @@ const faqs = [
 
 export default function FAQSection() {
   const [openIndex, setOpenIndex] = useState(null);
+  const refs = useRef([]);
 
   const toggleFAQ = (index) => {
-    setOpenIndex(openIndex === index ? null : index);
+    const isOpening = openIndex !== index;
+    setOpenIndex(isOpening ? index : null);
+
+    // Scroll to question when opened (especially on mobile)
+    if (isOpening && refs.current[index]) {
+      setTimeout(() => {
+        refs.current[index].scrollIntoView({
+          behavior: "smooth",
+          block: "start",
+        });
+      }, 150);
+    }
   };
 
   return (
-    <div className=" py-12 px-4 sm:px-6 md:px-10 lg:px-20 bg-gray-900">
+    <div className="py-12 px-4 sm:px-6 md:px-10 lg:px-20 ">
       {/* Section Heading */}
       <div className="text-center max-w-3xl mx-auto mb-10 sm:mb-12">
         <h2 className="text-3xl sm:text-4xl font-extrabold leading-tight mb-4 text-white/80 drop-shadow-md">
@@ -64,22 +76,26 @@ export default function FAQSection() {
         </p>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-6  max-w-7xl mx-auto">
+      {/* FAQ List */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 max-w-7xl mx-auto">
         {faqs.map((faq, index) => (
           <div
             key={index}
+            ref={(el) => (refs.current[index] = el)}
             onClick={() => toggleFAQ(index)}
-            className={`relative transition-all duration-300 rounded-xl border border-gray-700 bg-white/90 hover:bg-white shadow-md hover:shadow-lg cursor-pointer p-5 sm:p-6`}
+            className="relative transition-all duration-300 rounded-xl border border-gray-700 bg-white/90 hover:bg-white shadow-md hover:shadow-lg cursor-pointer p-5 sm:p-6"
           >
             <div className="flex justify-between items-center">
               <h3 className="text-base sm:text-lg font-semibold text-gray-800">
                 {faq.question}
               </h3>
-              {openIndex === index ? (
-                <Minus className="text-gray-800 transition-transform duration-200" />
-              ) : (
-                <Plus className="text-gray-800 transition-transform duration-200" />
-              )}
+              <div
+                className={`transition-transform duration-300 ${
+                  openIndex === index ? "rotate-45" : ""
+                }`}
+              >
+                <Plus className="text-gray-800" />
+              </div>
             </div>
 
             <div

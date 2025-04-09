@@ -184,7 +184,7 @@ const getIncomeBreakdown = async (req, res, next) => {
       },
       {
         $lookup: {
-          from: "sources", // Name of the collection storing sources
+          from: "categories", // Name of the collection storing sources
           localField: "_id", // Field from the Income model that references the Source model
           foreignField: "_id", // _id of the Source model
           as: "sourceInfo", // The resulting field that will hold the source info
@@ -196,9 +196,9 @@ const getIncomeBreakdown = async (req, res, next) => {
       {
         $project: {
           _id: 0, // Remove the _id field if it's not needed
-          source: "$sourceInfo.name", 
+          source: "$sourceInfo.name",
           iconImage: "$sourceInfo.iconImage", // Extract source iconImage
-          totalAmount: 1, 
+          totalAmount: 1,
         },
       },
     ]);

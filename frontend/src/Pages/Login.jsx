@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { toast } from "react-toastify";
 import { useAuth } from "../Store/auth";
+import Logo from "../components/Logo";
 
 const Login = () => {
   const [loading, setLoading] = useState(false);
@@ -45,9 +46,7 @@ const Login = () => {
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen p-6">
-      <h1 className="text-5xl mb-11 font-bold text-center text-gray-700">
-        Expense<span className="text-cyan-600">Tracker</span>
-      </h1>
+      <Logo />
       <div className="bg-white p-5 rounded-2xl shadow-2xl w-full max-w-md">
         <h2 className="text-3xl font-bold text-center text-gray-800 mt-2">
           Login

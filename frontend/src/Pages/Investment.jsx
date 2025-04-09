@@ -6,6 +6,9 @@ import { motion } from "framer-motion";
 import { useAuth } from "../Store/auth";
 import { Link, useLocation } from "react-router-dom";
 import { ChevronDown, Edit2, Trash, X } from "lucide-react";
+import Breadcrumb from "../layout/Breadcrumbs";
+import SearchBar from "../layout/SearchBar";
+import TopActionBar from "../layout/PageHeader";
 
 const Investment = () => {
   const { authorizationToken } = useAuth();
@@ -31,6 +34,29 @@ const Investment = () => {
   const [showModal, setShowModal] = useState(false);
   const [expanded, setExpanded] = useState(null);
   const [deleteModal, setDeleteModal] = useState(null);
+  const [filterDate, setFilterDate] = useState("");
+  const [searchTerm, setSearchTerm] = useState("");
+
+  const getFilteredInvestments = () => {
+    return investments.filter((investment) => {
+      if (
+        filterDate &&
+        (!investment.date || !investment.date.startsWith(filterDate))
+      )
+        return false;
+      const search = searchTerm.toLowerCase();
+      const matchesSearch =
+        investment.name?.toLowerCase().includes(search) ||
+        investment.investmentType?.name?.toLowerCase().includes(search) ||
+        investment.platform?.toLowerCase().includes(search) ||
+        investment.description?.toLowerCase().includes(search);
+
+      if (searchTerm && !matchesSearch) return false;
+      return true;
+    });
+  };
+
+  const filteredInvestments = getFilteredInvestments();
 
   // Fetch investment
   const fetchInvestments = async () => {
@@ -181,81 +207,63 @@ const Investment = () => {
 
   return (
     <>
-      <motion.div className="flex-1 mx-auto my-12 p-6">
-        <div className="p-8">
+      <motion.div className="flex-1 mx-auto my-12 max-w-full">
+        <div className="px-6">
           {/* Header Section */}
-          <div className="flex justify-between items-center mb-6">
-            <h2 className="text-4xl font-bold text-gray-800 tracking-tight">
-              Investments
-            </h2>
-
-            <button
-              onClick={() => handleOpenModal(null)}
-              className="bg-gradient-to-r from-cyan-500 to-cyan-700 text-white p-4 rounded-full shadow-lg hover:scale-110 hover:shadow-xl transition-transform flex items-center justify-center"
-              aria-label="Add Investment"
-            >
-              <FaPlus size={20} />
-            </button>
+          <div className="flex justify-end items-center mb-6">
+            <TopActionBar
+              label="Investment"
+              onAddClick={() => handleOpenModal(null)}
+              filterDate={filterDate}
+              onDateChange={setFilterDate}
+            />
           </div>
 
           {/* Breadcrums for navigate */}
-          <nav className="text-sm text-gray-500 mb-4 flex items-center space-x-2">
-            <Link
-              to="/home"
-              className={`${
-                location.pathname === "/home"
-                  ? "text-cyan-900 font-semibold"
-                  : "hover:text-cyan-900"
-              }`}
-            >
-              Home
-            </Link>
-            <span className="text-gray-400">/</span>
-            <Link
-              to="/investment"
-              className={`${
-                location.pathname === "/investment"
-                  ? "text-cyan-900 font-semibold"
-                  : "hover:text-cyan-900"
-              }`}
-            >
-              Investment
-            </Link>
-          </nav>
+          <Breadcrumb />
 
           {/* Investment Summary Cards */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
-            <div className="bg-blue-50 p-6 rounded-2xl flex items-center shadow-md">
-              <div className="bg-blue-200 p-3 rounded-full">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
+            {/* Remaining Investment Card */}
+            <div className="bg-blue-50 p-5 sm:p-6 rounded-2xl flex items-center shadow-md hover:shadow-lg transition-shadow">
+              <div className="bg-blue-200 p-3 rounded-full flex-shrink-0">
                 <FaRupeeSign className="text-blue-600 text-2xl" />
               </div>
-              <div className="ml-4">
-                <h3 className="text-sm text-gray-500">Remaining Investment</h3>
-                <p className="text-4xl font-extrabold text-gray-800">
+              <div className="ml-4 min-w-0">
+                <h3 className="text-sm sm:text-base text-gray-500 truncate">
+                  Remaining Investment
+                </h3>
+                <p className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-gray-800">
                   ₹{remainingInvestments.toLocaleString()}
                 </p>
               </div>
             </div>
 
-            <div className="bg-purple-50 p-6 rounded-2xl flex items-center shadow-md">
-              <div className="bg-purple-200 p-3 rounded-full">
+            {/* Withdraw Investments Card */}
+            <div className="bg-purple-50 p-5 sm:p-6 rounded-2xl flex items-center shadow-md hover:shadow-lg transition-shadow">
+              <div className="bg-purple-200 p-3 rounded-full flex-shrink-0">
                 <FaRupeeSign className="text-purple-600 text-2xl" />
               </div>
-              <div className="ml-4">
-                <h3 className="text-sm text-gray-500">Withdraw Investments</h3>
-                <p className="text-4xl font-extrabold text-gray-800">
+              <div className="ml-4 min-w-0">
+                <h3 className="text-sm sm:text-base text-gray-500 truncate">
+                  Withdraw Investments
+                </h3>
+                <p className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-gray-800">
                   ₹{withdrawInvestments.toLocaleString()}
                 </p>
               </div>
             </div>
 
-            <div className="bg-pink-50 p-6 rounded-2xl flex items-center shadow-md">
-              <div className="bg-pink-200 p-3 rounded-full">
+            {/* Total Investments Card */}
+            <div className="bg-pink-50 p-5 sm:p-6 rounded-2xl flex items-center shadow-md hover:shadow-lg transition-shadow">
+              <div className="bg-pink-200 p-3 rounded-full flex-shrink-0">
                 <FaRupeeSign className="text-pink-600 text-2xl" />
               </div>
-              <div className="ml-4">
-                <h3 className="text-sm text-gray-500">Total Investments</h3>
-                <p className="text-4xl font-extrabold text-gray-800">
+              <div className="ml-4 min-w-0">
+                <h3 className="text-sm sm:text-base text-gray-500 truncate">
+                  Total Investments
+                </h3>
+                <p className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-gray-800">
                   ₹{totalInvestments.toLocaleString()}
                 </p>
               </div>
@@ -263,142 +271,144 @@ const Investment = () => {
           </div>
 
           {/* Search Filter Section */}
-          <div className="mb-6">
-            <div className="flex items-center border border-gray-300 rounded-full px-4 py-3 shadow-sm w-full focus-within:border-cyan-600">
-              <FaSearch className="text-gray-300 text-lg mr-2 focus-within:text-cyan-600" />
-              <input
-                type="text"
-                placeholder="Search investments..."
-                className="w-full bg-transparent outline-none text-sm text-gray-500"
-                onFocus={(e) =>
-                  e.target.previousSibling.classList.add("text-cyan-600")
-                }
-                onBlur={(e) =>
-                  e.target.previousSibling.classList.remove("text-cyan-600")
-                }
-              />
-            </div>
-          </div>
+          <SearchBar
+            placeholder={"Search Investments..."}
+            searchValue={searchTerm}
+            onSearchChange={setSearchTerm}
+          />
 
           {/* Investment List */}
           <motion.div className="mt-6">
-            {investments.length === 0 ? (
+            {filteredInvestments.length === 0 ? (
               <p className="text-center text-gray-600 text-lg italic">
                 No investments added yet.
               </p>
             ) : (
-              <div className="space-y-6 bg-gradient-to-b from-blue-50 to-gray-50 p-6 rounded-lg shadow">
-                {investments.map((inv) => (
-                  <div
+              <div className="space-y-6">
+                {filteredInvestments.map((inv) => (
+                  <motion.div
                     key={inv._id}
-                    className="bg-white p-5 rounded-xl shadow-md border border-gray-200 hover:shadow-lg transition-all w-full"
+                    layout
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -10 }}
+                    transition={{ duration: 0.25, ease: "easeOut" }}
+                    className="bg-white p-4 sm:p-5 rounded-2xl border border-gray-200 shadow-md hover:shadow-lg transition-all relative"
                   >
-                    <div className="flex items-center justify-between cursor-pointer">
-                      {/* Left Side - Investment Image & Details */}
-                      <div className="flex items-start w-2/3 space-x-5">
-                        {/* Investment Icon */}
-                        <div className="w-16 h-14 rounded-full overflow-hidden border border-red-400 shadow">
+                    {/* Chevron Toggle */}
+                    <motion.button
+                      className="absolute top-0 right-1 p-2 rounded-full hover:bg-gray-200 text-gray-600 transition"
+                      initial={{ rotate: 0 }}
+                      animate={{ rotate: expanded === inv._id ? 180 : 0 }}
+                      onClick={() =>
+                        setExpanded(inv._id === expanded ? null : inv._id)
+                      }
+                    >
+                      <ChevronDown size={22} />
+                    </motion.button>
+
+                    {/* Main Row */}
+                    <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-4 flex-wrap">
+                      {/* Left Block */}
+                      <div className="flex items-start gap-4 flex-1 min-w-0">
+                        {/* Icon */}
+                        <div className="w-10 h-10 flex-shrink-0">
                           {inv?.investmentType?.iconImage ? (
                             <img
                               src={`${
                                 import.meta.env.VITE_BACKEND_URL
                               }/uploads/${inv.investmentType.iconImage}`}
-                              alt={inv.investmentType.name || "Category"}
-                              className="w-full h-full object-cover"
+                              alt={inv.investmentType.name || "Type"}
+                              className="w-full h-full object-contain rounded transition-transform duration-200 hover:scale-105"
                             />
                           ) : (
-                            <div className="w-full h-full flex items-center justify-center bg-gray-200 text-gray-600">
+                            <div className="text-xs text-gray-400">
                               No Image
                             </div>
                           )}
                         </div>
 
-                        {/* Investment Details */}
-                        <div className="flex flex-col w-full">
-                          <h2 className="text-lg font-semibold text-gray-900">
+                        {/* Details */}
+                        <div className="flex flex-col min-w-0">
+                          <p className="text-base sm:text-md font-medium text-gray-800 line-clamp-1">
                             {inv.name}
-                          </h2>
-                          <p className="text-sm text-gray-600">
+                          </p>
+                          <span className="text-sm text-gray-500 mt-1 truncate">
                             {inv?.investmentType?.name} • {inv.platform}
-                          </p>
-
-                          {/* Current Amount */}
-                          <p className="mt-2 text-sm text-gray-500">
-                            Current Amount
-                          </p>
-                          <p className="text-xl font-bold text-blue-900">
-                            ₹{inv.currentAmount.toLocaleString()}
-                          </p>
-
-                          {/* Description Field
-                      <p className="mt-2 text-sm text-gray-600">Description</p>
-                      <p className="text-sm font-medium text-gray-700">
-                        {inv.description}
-                      </p> */}
+                          </span>
                         </div>
                       </div>
 
-                      {/* Right Side - Invested Amount & Dropdown */}
-                      <div className="flex flex-col items-end w-1/3">
-                        {/* Dropdown Icon */}
-                        <motion.button
-                          className="p-2 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-600 transition"
-                          initial={{ rotate: 0 }}
-                          animate={{ rotate: expanded === inv._id ? 180 : 0 }}
-                        >
-                          <ChevronDown
-                            size={18}
-                            onClick={() =>
-                              setExpanded(inv._id === expanded ? null : inv._id)
-                            }
-                          />
-                        </motion.button>
-
-                        {/* Invested Amount */}
-                        <div className="mt-4 text-right">
-                          <p className="text-sm text-gray-500">
-                            Invested Amount
-                          </p>
-                          <p className="text-2xl font-bold text-green-900">
-                            ₹{inv.investedAmount.toLocaleString()}
-                          </p>
-                        </div>
+                      {/* Amount */}
+                      <div className="flex flex-col items-end text-right px-6 sm:px-4 py-2">
+                        <span className="text-sm font-medium text-gray-500">
+                          Invested Amount:
+                        </span>
+                        <span className="text-lg sm:text-xl font-bold text-gray-800 mt-1">
+                          ₹{inv.investedAmount.toLocaleString()}
+                        </span>
                       </div>
                     </div>
-                    {/* Expanded Dropdown Section */}
+
+                    {/* Expanded Section */}
                     <motion.div
                       initial={{ opacity: 0, height: 0 }}
                       animate={
                         expanded === inv._id
-                          ? { opacity: 1, height: "auto" }
-                          : { opacity: 0, height: 0 }
+                          ? { opacity: 1, height: "auto", marginTop: 16 }
+                          : { opacity: 0, height: 0, marginTop: 0 }
                       }
                       transition={{ duration: 0.3 }}
                       className="overflow-hidden"
                     >
-                      <div className="flex items-center justify-between mt-4 border-t pt-4 bg-gray-50 p-4 rounded-md">
-                        <p className="text-gray-700">
-                          Description : {inv.description}
-                        </p>
+                      <div className="mt-4 bg-gradient-to-br from-gray-50 to-white border-t pt-5 px-4 pb-4 rounded-xl shadow-inner text-sm text-gray-700 space-y-3">
+                        <div className="flex items-center gap-2">
+                          <span className="text-gray-500">💰</span>
+                          <span>
+                            <span className="font-medium text-gray-600">
+                              Current Amount:
+                            </span>{" "}
+                            ₹{inv.currentAmount.toLocaleString()}
+                          </span>
+                        </div>
 
-                        {/* Buttons: Edit & Delete */}
-                        <div className="flex justify-end space-x-3 mt-3">
+                        <div className="flex items-center gap-2">
+                          <span className="text-gray-500">📝</span>
+                          <span>
+                            <span className="font-medium text-gray-600">
+                              Description:
+                            </span>{" "}
+                            {inv.description || "N/A"}
+                          </span>
+                        </div>
+
+                        {/* Actions */}
+                        <div className="pt-4 flex flex-wrap justify-end gap-3">
                           <button
                             onClick={() => handleOpenModal(inv)}
-                            className="px-4 py-2 text-blue-600 border border-blue-600 rounded-lg hover:bg-blue-50 transition"
+                            className="group flex items-center gap-2 px-4 py-2 text-sm font-medium text-blue-700 bg-blue-50 border border-blue-200 rounded-xl hover:bg-blue-100 hover:text-blue-800 transition-all shadow-sm"
                           >
-                            <Edit2 />
+                            <Edit2
+                              size={16}
+                              className="group-hover:scale-110 transition-transform"
+                            />
+                            Edit
                           </button>
+
                           <button
                             onClick={() => handleDeleteClick(inv._id)}
-                            className="px-4 py-2 text-red-600 border border-red-600 rounded-lg hover:bg-red-50 transition"
+                            className="group flex items-center gap-2 px-4 py-2 text-sm font-medium text-red-700 bg-red-50 border border-red-200 rounded-xl hover:bg-red-100 hover:text-red-800 transition-all shadow-sm"
                           >
-                            <Trash />
+                            <Trash
+                              size={16}
+                              className="group-hover:scale-110 transition-transform"
+                            />
+                            Delete
                           </button>
                         </div>
                       </div>
                     </motion.div>
-                  </div>
+                  </motion.div>
                 ))}
               </div>
             )}

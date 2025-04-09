@@ -59,7 +59,7 @@ export default function HeroSection() {
             transition={{ delay: 0.4, duration: 0.5 }}
           >
             <Button
-              className="bg-gradient-to-r from-cyan-900 to-blue-800 text-white px-6 py-2 rounded-full shadow-lg hover:scale-105 transition duration-300"
+              className="bg-gradient-to-r from-cyan-900 to-blue-700 text-white px-8 py-2.5 rounded-full shadow-lg hover:scale-105 transition duration-300 font-bold"
               onClick={handleGetStarted}
             >
               <span className="flex items-center justify-center gap-2">

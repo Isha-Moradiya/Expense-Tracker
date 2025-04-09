@@ -4,8 +4,10 @@ import { motion } from "framer-motion";
 import { useAuth } from "../Store/auth";
 import { toast } from "react-toastify";
 import { FaPlus } from "react-icons/fa";
-import { ChevronDownIcon, Trash, X } from "lucide-react";
+import { ChevronDownIcon, Edit, Edit2, Trash, X } from "lucide-react";
 import { Link } from "react-router-dom";
+import Breadcrumb from "../layout/Breadcrumbs";
+import TopActionBar from "../layout/PageHeader";
 const colors = {
   Expense: "text-red-600 border-red-300",
   Income: "text-green-600 border-green-300",
@@ -25,6 +27,8 @@ function Category() {
   const [activeTab, setActiveTab] = useState("Expense");
   const [editCategory, setEditCategory] = useState(null);
   const [showModal, setShowModal] = useState(false);
+  const [deleteModal, setDeleteModal] = useState(null);
+
   const { authorizationToken } = useAuth();
 
   useEffect(() => {
@@ -95,6 +99,16 @@ function Category() {
     setEditCategory(null);
   };
 
+  //Handle Delete
+  const handleDeleteClick = (id) => {
+    setDeleteModal(id);
+  };
+
+  const confirmDelete = () => {
+    handleDeleteCategory(deleteModal);
+    setDeleteModal(null);
+  };
+
   const handleDeleteCategory = async (id) => {
     try {
       const response = await axios.delete(
@@ -113,105 +127,92 @@ function Category() {
   };
 
   return (
-    <motion.div className="flex-1 mx-auto my-12 p-6">
-      <div className="p-8">
+    <motion.div className="flex-1 mx-auto my-12 max-w-full">
+      <div className="px-6">
         {/* Header Section */}
-        <div className="flex justify-between items-center mb-6">
-          <h2 className="text-4xl font-bold text-gray-800 tracking-tight">
-            Manage Categories
-          </h2>
-          <button
-            onClick={() => setShowModal(true)}
-            className="bg-gradient-to-r from-red-500 to-red-700 text-white p-4 rounded-full shadow-lg hover:scale-110 hover:shadow-xl transition-transform flex items-center justify-center"
-            aria-label="Add Expense"
-          >
-            <FaPlus size={20} />
-          </button>
+        <div className="flex justify-end items-center mb-6">
+          <TopActionBar
+            label="Category"
+            // onAddClick={() => handleOpenModal(null)}
+            // filterDate={filterDate}
+            // onDateChange={setFilterDate}
+          />
         </div>
 
         {/* Breadcrums for navigate */}
-        <nav className="text-sm text-gray-500 mb-4 flex items-center space-x-2">
-          <Link
-            to="/home"
-            className={`${
-              location.pathname === "/home"
-                ? "text-cyan-900 font-semibold"
-                : "hover:text-cyan-900"
-            }`}
-          >
-            Home
-          </Link>
-          <span className="text-gray-400">/</span>
-          <Link
-            to="/category"
-            className={`${
-              location.pathname === "/category"
-                ? "text-cyan-900 font-semibold"
-                : "hover:text-cyan-900"
-            }`}
-          >
-            Category
-          </Link>
-        </nav>
+        <Breadcrumb />
 
         {/* Category List */}
-        <div className="min-h-screen w-full mt-6 p-6">
-          <div className="flex justify-start space-x-4 mb-6 border-b border-gray-300 pb-3">
-            {["Expense", "Income", "Investment"].map((type) => (
-              <button
-                key={type}
-                onClick={() => setActiveTab(type)}
-                className={`px-6 py-2 text-lg font-semibold rounded-lg transition-all duration-300 ${
-                  activeTab === type
-                    ? "text-blue-700 bg-white shadow-sm border-b-2 border-blue-500"
-                    : "text-gray-500 hover:text-gray-700 hover:bg-gray-100"
-                }`}
-              >
-                {type}
-              </button>
-            ))}
+        <div className="min-h-screen w-full mt-10">
+          {/* Tabs */}
+          <div className="flex flex-wrap justify-start gap-3 sm:gap-4 mb-6 pb-3">
+            {["Expense", "Income", "Investment"].map((type) => {
+              const isActive = activeTab === type;
+              return (
+                <button
+                  key={type}
+                  onClick={() => setActiveTab(type)}
+                  className={`px-4 sm:px-5 md:px-6 py-2 sm:py-2.5 rounded-full border transition-all duration-300 text-sm sm:text-base font-medium shadow-sm ${
+                    isActive
+                      ? "bg-gray-100 border-gray-600 text-gray-800 shadow-md"
+                      : "bg-white border-gray-300 text-gray-600 hover:bg-gray-100 hover:text-gray-800"
+                  }`}
+                >
+                  {type}
+                </button>
+              );
+            })}
           </div>
 
-          <div className="p-6 rounded-xl shadow-lg border border-gray-200 w-full bg-white">
+          {/* Category List Wrapper */}
+          <div>
             <ul className="space-y-4 w-full">
               {categories[activeTab]?.length > 0 ? (
                 categories[activeTab].map((category) => (
                   <li
                     key={category._id}
-                    className="flex items-center justify-between bg-gray-50 p-4 rounded-lg shadow-sm border border-gray-300 transition-all duration-300 hover:shadow-md hover:-translate-y-1"
+                    className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 bg-white p-4 rounded-xl border border-gray-200 shadow-sm hover:shadow-md hover:-translate-y-1 transition-all duration-300"
                   >
-                    <div className="flex items-center space-x-4">
+                    {/* Icon + Name */}
+                    <div className="flex items-center gap-4">
                       {category.iconImage && (
-                        <img
-                          src={`${import.meta.env.VITE_BACKEND_URL}/uploads/${
-                            category.iconImage
-                          }`}
-                          alt="icon"
-                          className="w-12 h-12 rounded-lg border border-gray-300 shadow-sm"
-                        />
+                        <div className="w-12 h-12 flex-shrink-0">
+                          <img
+                            src={`${import.meta.env.VITE_BACKEND_URL}/uploads/${
+                              category.iconImage
+                            }`}
+                            alt="icon"
+                            className="w-full h-full object-contain rounded-md transition-transform duration-200 hover:scale-105"
+                          />
+                        </div>
                       )}
-                      <span className="text-gray-800 text-lg font-medium">
+                      <span className="text-gray-800 text-base sm:text-lg font-semibold truncate max-w-[180px] sm:max-w-xs">
                         {category.name}
                       </span>
                     </div>
-                    <button
-                      onClick={() => {
-                        setEditCategory(category);
-                        setName(category.name);
-                        setCategoryType(category.categoryType);
-                        setShowModal(true);
-                      }}
-                      className="p-2 rounded-full bg-gray-100 hover:bg-gray-200 transition"
-                    >
-                      <ChevronDownIcon className="w-5 h-5 text-gray-600" />
-                    </button>
-                    <button
-                      onClick={() => handleDeleteCategory(category._id)}
-                      className="p-2 rounded-full bg-red-100 hover:bg-red-200 transition"
-                      title="Delete Category"
-                    >
-                      <Trash className="w-5 h-5 text-red-600" />
-                    </button>
+
+                    {/* Action Buttons */}
+                    <div className="flex gap-2 justify-end">
+                      <button
+                        onClick={() => {
+                          setEditCategory(category);
+                          setName(category.name);
+                          setCategoryType(category.categoryType);
+                          setShowModal(true);
+                        }}
+                        className="p-2 rounded-full bg-blue-100 hover:bg-blue-200 transition"
+                        title="Edit Category"
+                      >
+                        <Edit2 className="w-5 h-5 text-blue-600" />
+                      </button>
+                      <button
+                        onClick={() => handleDeleteClick(category._id)}
+                        className="p-2 rounded-full bg-red-100 hover:bg-red-200 transition"
+                        title="Delete Category"
+                      >
+                        <Trash className="w-5 h-5 text-red-600" />
+                      </button>
+                    </div>
                   </li>
                 ))
               ) : (
@@ -223,6 +224,41 @@ function Category() {
           </div>
         </div>
       </div>
+
+      {/* Delete Confirmation Modal */}
+      {deleteModal && (
+        <div className="fixed inset-0 bg-opacity-50 backdrop-blur-sm flex justify-center items-center z-50">
+          <div className="relative p-10 bg-gradient-to-tr from-red-50 via-white to-gray-100 rounded-2xl shadow-2xl w-full max-w-md">
+            {/* Cancel Icon at the Top Right */}
+            <button
+              type="button"
+              onClick={() => setDeleteModal(null)}
+              className="absolute top-4 right-4 text-gray-500 hover:text-red-500 transition"
+            >
+              <X className="w-7 h-7" />
+            </button>
+
+            <h3 className="text-3xl font-extrabold text-center mb-8 text-gray-800">
+              Confirm Delete
+            </h3>
+            <p className="text-gray-600 text-center mb-6">
+              Are you sure you want to delete this category? This action cannot
+              be undone.
+            </p>
+
+            {/* Action Buttons */}
+            <div className="flex justify-center space-x-6 mt-6">
+              {/* Confirm Delete Button */}
+              <button
+                onClick={confirmDelete}
+                className="px-5 py-3 bg-red-500 text-white rounded-lg hover:bg-red-600 transition"
+              >
+                Confirm Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {showModal && (
         <div className="fixed inset-0  bg-opacity-50 backdrop-blur-sm flex justify-center items-center z-50">

@@ -6,6 +6,9 @@ import { useAuth } from "../Store/auth";
 import axios from "axios";
 import { toast } from "react-toastify";
 import { ChevronDown, ChevronRight, Edit2, Trash, X } from "lucide-react";
+import Breadcrumb from "../layout/Breadcrumbs";
+import SearchBar from "../layout/SearchBar";
+import TopActionBar from "../layout/PageHeader";
 
 const LentMoney = () => {
   const { authorizationToken } = useAuth();
@@ -33,6 +36,24 @@ const LentMoney = () => {
 
   const [expanded, setExpanded] = useState(null);
   const [deleteModal, setDeleteModal] = useState(null);
+  const [searchTerm, setSearchTerm] = useState("");
+
+  const getFilteredLent = () => {
+    return lentMoneyRecords.filter((lent) => {
+      // if (filterDate && !expense.date.startsWith(filterDate)) return false;
+
+      const search = searchTerm.toLowerCase();
+      const matchesSearch =
+        lent.borrower?.toLowerCase().includes(search) ||
+        lent.description?.toLowerCase().includes(search);
+
+      if (searchTerm && !matchesSearch) return false;
+
+      return true;
+    });
+  };
+
+  const filteredLent = getFilteredLent();
 
   // Fetch Lent Money Records
   const fetchLentMoneyRecords = async () => {
@@ -184,50 +205,24 @@ const LentMoney = () => {
 
   return (
     <>
-      <motion.div className="flex-1 mx-auto my-12 p-6">
-        <div className="p-8">
+      <motion.div className="flex-1 mx-auto my-12 max-w-full">
+        <div className="px-6">
           {/* Header Section */}
-          <div className="flex justify-between items-center mb-6">
-            <h2 className="text-4xl font-extrabold text-gray-900 tracking-tight">
-              Lent Money
-            </h2>
-
-            <button
-              onClick={() => handleOpenModal(null)}
-              className="bg-gradient-to-r from-yellow-500 to-yellow-700 text-white p-4 rounded-full shadow-lg hover:scale-110 hover:shadow-xl transition-transform flex items-center justify-center"
-              aria-label="Add Lent Money"
-            >
-              <FaPlus size={20} />
-            </button>
+          <div className="flex justify-end items-center mb-6">
+            <TopActionBar
+              label="Lent"
+              onAddClick={() => handleOpenModal(null)}
+              // filterDate={filterDate}
+              // onDateChange={setFilterDate}
+            />
           </div>
 
           {/* Breadcrumb Navigation */}
-          <nav className="text-sm text-gray-500 mb-4 flex items-center space-x-2">
-            <Link
-              to="/home"
-              className={`${
-                location.pathname === "/home"
-                  ? "text-cyan-900 font-semibold"
-                  : "hover:text-cyan-700"
-              }`}
-            >
-              Home
-            </Link>
-            <span className="text-gray-400">/</span>
-            <Link
-              to="/lent-money"
-              className={`${
-                location.pathname === "/lent-money"
-                  ? "text-cyan-900 font-semibold"
-                  : "hover:text-cyan-900"
-              }`}
-            >
-              Lent-Money
-            </Link>
-          </nav>
+          <Breadcrumb />
 
           {/* Summary Cards */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
+            {/* Remaining Lent Money */}
             <div className="bg-blue-50 p-6 rounded-2xl flex items-center shadow-md hover:shadow-lg transition-shadow">
               <div className="bg-blue-200 p-3 rounded-full">
                 <FaRupeeSign className="text-blue-600 text-2xl" />
@@ -240,6 +235,7 @@ const LentMoney = () => {
               </div>
             </div>
 
+            {/* Get Back Money */}
             <div className="bg-purple-50 p-6 rounded-2xl flex items-center shadow-md hover:shadow-lg transition-shadow">
               <div className="bg-purple-200 p-3 rounded-full">
                 <FaRupeeSign className="text-purple-600 text-2xl" />
@@ -252,6 +248,7 @@ const LentMoney = () => {
               </div>
             </div>
 
+            {/* Total Lent Money */}
             <div className="bg-pink-50 p-6 rounded-2xl flex items-center shadow-md hover:shadow-lg transition-shadow">
               <div className="bg-pink-200 p-3 rounded-full">
                 <FaRupeeSign className="text-pink-600 text-2xl" />
@@ -266,40 +263,46 @@ const LentMoney = () => {
           </div>
 
           {/* Search Filter Section */}
-          <div className="mb-6">
-            <div className="flex items-center border border-gray-300 rounded-full px-4 py-3 shadow-sm w-full focus-within:border-cyan-600 hover:border-cyan-500 transition-colors">
-              <FaSearch className="text-gray-400 text-lg mr-2 focus-within:text-cyan-600" />
-              <input
-                type="text"
-                placeholder="Search lent money..."
-                className="w-full bg-transparent outline-none text-sm text-gray-600"
-                onFocus={(e) =>
-                  e.target.previousSibling.classList.add("text-cyan-600")
-                }
-                onBlur={(e) =>
-                  e.target.previousSibling.classList.remove("text-cyan-600")
-                }
-              />
-            </div>
-          </div>
+          <SearchBar
+            placeholder={"Search Lent..."}
+            searchValue={searchTerm}
+            onSearchChange={setSearchTerm}
+          />
 
           {/* Lent Money List */}
-          <motion.div className="space-y-6 bg-gradient-to-b from-green-50 to-lime-50 p-6 rounded-lg">
-            {lentMoneyRecords.length === 0 ? (
+          <motion.div className="mt-6 space-y-6">
+            {filteredLent.length === 0 ? (
               <p className="text-center text-gray-600 text-lg italic">
                 No lent records found.
               </p>
             ) : (
-              lentMoneyRecords.map((lent) => (
-                <div
+              filteredLent.map((lent) => (
+                <motion.div
                   key={lent._id}
-                  className="bg-white p-5 rounded-xl shadow-md border border-gray-200 hover:shadow-lg transition-all w-full"
+                  layout
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                  transition={{ duration: 0.25, ease: "easeOut" }}
+                  className="bg-white p-4 sm:p-5 rounded-2xl border border-gray-200 shadow-md hover:shadow-lg transition-all relative"
                 >
-                  <div className="flex items-center justify-between cursor-pointer">
-                    {/* Left Side - Borrower Image, Name & Remaining Amount */}
-                    <div className="flex items-start space-x-5">
-                      {/* Borrower Image */}
-                      <div className="w-14 h-14 flex-shrink-0">
+                  {/* Chevron Toggle */}
+                  <motion.button
+                    className="absolute top-0 right-1 p-2 rounded-full hover:bg-gray-200 text-gray-600 transition"
+                    initial={{ rotate: 0 }}
+                    animate={{ rotate: expanded === lent._id ? 180 : 0 }}
+                    onClick={() =>
+                      setExpanded(lent._id === expanded ? null : lent._id)
+                    }
+                  >
+                    <ChevronDown size={22} />
+                  </motion.button>
+
+                  {/* Main Content */}
+                  <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 flex-wrap sm:space-x-6">
+                    {/* Left Block */}
+                    <div className="flex items-center gap-4 flex-1 min-w-0">
+                      <div className="w-10 h-10 flex-shrink-0">
                         <img
                           src={
                             lent.borrowerImage
@@ -308,50 +311,25 @@ const LentMoney = () => {
                                 }`
                               : "/images/profile-circle.svg"
                           }
-                          alt="Borrower"
-                          className="w-full h-full rounded-full object-cover border border-green-400 shadow"
+                          alt={lent.borrower || "Borrower"}
+                          className="w-full h-full object-cover rounded-full border border-green-300 shadow"
                         />
                       </div>
-
-                      {/* Borrower Name & Remaining Amount */}
-                      <div>
-                        <h2 className="text-lg font-semibold text-gray-900 mb-2">
+                      <div className="flex flex-col min-w-0">
+                        <p className="text-base font-medium text-gray-800 line-clamp-1">
                           {lent.borrower}
-                        </h2>
-                        <p className="text-sm text-gray-500">
+                        </p>
+                        <span className="text-sm text-gray-500">
                           Remaining Amount
-                        </p>
-                        <p className="text-xl font-bold text-green-900">
+                        </span>
+                        <span className="text-lg font-bold text-gray-800">
                           ₹{lent.remainingAmount.toLocaleString()}
-                        </p>
+                        </span>
                       </div>
                     </div>
 
-                    {/* Right Side - Dropdown, Total Amount & Status */}
-                    <div className="flex flex-col items-end space-y-3">
-                      {/* Dropdown Icon */}
-                      <motion.button
-                        className="p-2 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-600 transition"
-                        initial={{ rotate: 0 }}
-                        animate={{ rotate: expanded === lent._id ? 180 : 0 }}
-                      >
-                        <ChevronDown
-                          size={18}
-                          onClick={() =>
-                            setExpanded(lent._id === expanded ? null : lent._id)
-                          }
-                        />
-                      </motion.button>
-
-                      {/* Total Lent Amount */}
-                      <div className="text-right">
-                        <p className="text-sm text-gray-500">Total Lent</p>
-                        <p className="text-xl font-bold text-green-900">
-                          ₹{lent.initialAmount.toLocaleString()}
-                        </p>
-                      </div>
-
-                      {/* Status Badge */}
+                    {/* Right Block */}
+                    <div className="flex sm:flex-col items-start sm:items-end justify-between sm:justify-center gap-2 sm:gap-1 text-right sm:px-4 py-3 sm:py-0">
                       <span
                         className={`px-4 py-1.5 text-sm font-semibold rounded-full ${
                           lent.remainingAmount > 0
@@ -361,43 +339,79 @@ const LentMoney = () => {
                       >
                         {lent.remainingAmount > 0 ? "Unpaid" : "Paid"}
                       </span>
+                      <div>
+                        <p className="text-sm text-gray-500">Total Lent</p>
+                        <p className="text-xl font-bold text-gray-800">
+                          ₹{lent.initialAmount.toLocaleString()}
+                        </p>
+                      </div>
                     </div>
                   </div>
 
-                  {/* Expanded Dropdown Section */}
+                  {/* Expanded Content */}
                   <motion.div
                     initial={{ opacity: 0, height: 0 }}
                     animate={
                       expanded === lent._id
-                        ? { opacity: 1, height: "auto" }
-                        : { opacity: 0, height: 0 }
+                        ? { opacity: 1, height: "auto", marginTop: 16 }
+                        : { opacity: 0, height: 0, marginTop: 0 }
                     }
                     transition={{ duration: 0.3 }}
                     className="overflow-hidden"
                   >
-                    <div className="flex items-center justify-between mt-4 border-t pt-4 bg-gray-50 p-4 rounded-md">
-                      <p className="text-gray-700">
-                        Description : {lent.description}
-                      </p>
+                    <div className="mt-4 bg-gradient-to-br from-gray-50 to-white border-t pt-5 px-4 pb-4 rounded-xl shadow-inner text-sm text-gray-700 space-y-3">
+                      {/* Description */}
+                      <div className="flex items-center gap-2">
+                        <span className="text-gray-500">📝</span>
+                        <span>
+                          <span className="font-medium text-gray-600">
+                            Description:
+                          </span>{" "}
+                          {lent.description || "N/A"}
+                        </span>
+                      </div>
 
-                      {/* Buttons: Edit & Delete */}
-                      <div className="flex justify-end space-x-3 mt-3">
+                      {/* Received */}
+                      <div className="flex items-center gap-2">
+                        <span className="text-gray-500">💸</span>
+                        <span>
+                          <span className="font-medium text-gray-600">
+                            Received Amount:
+                          </span>{" "}
+                          ₹
+                          {(
+                            lent.initialAmount - lent.remainingAmount
+                          ).toLocaleString()}
+                        </span>
+                      </div>
+
+                      {/* Action Buttons */}
+                      <div className="pt-4 flex flex-wrap justify-end gap-3">
                         <button
                           onClick={() => handleOpenModal(lent)}
-                          className="px-4 py-2 text-blue-600 border border-blue-600 rounded-lg hover:bg-blue-50 transition"
+                          className="group flex items-center gap-2 px-4 py-2 text-sm font-medium text-blue-700 bg-blue-50 border border-blue-200 rounded-xl hover:bg-blue-100 hover:text-blue-800 transition-all shadow-sm"
                         >
-                          <Edit2 />
+                          <Edit2
+                            size={16}
+                            className="group-hover:scale-110 transition-transform"
+                          />
+                          Edit
                         </button>
+
                         <button
                           onClick={() => handleDeleteClick(lent._id)}
-                          className="px-4 py-2 text-red-600 border border-red-600 rounded-lg hover:bg-red-50 transition"
+                          className="group flex items-center gap-2 px-4 py-2 text-sm font-medium text-red-700 bg-red-50 border border-red-200 rounded-xl hover:bg-red-100 hover:text-red-800 transition-all shadow-sm"
                         >
-                          <Trash />
+                          <Trash
+                            size={16}
+                            className="group-hover:scale-110 transition-transform"
+                          />
+                          Delete
                         </button>
                       </div>
                     </div>
                   </motion.div>
-                </div>
+                </motion.div>
               ))
             )}
           </motion.div>

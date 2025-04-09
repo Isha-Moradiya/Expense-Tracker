@@ -16,16 +16,16 @@ const Home = () => {
         <Header />
         <HeroSection />
       </div>
-      <div className="w-full bg-gray-300 ">
+      <div className="w-full bg-gray-300 " id="feature">
         <FeaturesSection />
       </div>
-      <div className="w-full bg-gray-900 ">
+      <div className="w-full bg-gray-900 " id="about">
         <AboutUs />
       </div>
-      <div className="w-full bg-gray-300 ">
+      <div className="w-full bg-gray-300 " id="testimonial">
         <TestimonialSlider />
       </div>
-      <div className="w-full bg-gray-900 ">
+      <div className="w-full bg-gray-900 " id="faq">
         <FAQComponent />
       </div>
       <div className="w-full bg-gray-300 ">
