@@ -82,7 +82,7 @@ const createLent = async (req, res, next) => {
       // Save the new borrowed money record
       await newBorrowedMoney.save();
     } else {
-      const registrationLink = `${process.env.FRONTEND_URL}/`;
+      const registrationLink = `${process.env.FRONTEND_URL}/register`;
       const { subject, html } = lenderToBorrowerTemplate(
         borrower,
         lender,
